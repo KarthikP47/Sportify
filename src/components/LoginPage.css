@@ -1,0 +1,70 @@
+/* Ensure full-page centering with a uniform background color */
+body, html {
+    height: 100%;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(to right, #1e3c72, #2a5298); /* Consistent background */
+    font-family: Arial, sans-serif;
+}
+
+/* Center the login container */
+.login-container {
+    width: 400px;
+    padding: 20px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.15); /* Slight transparency */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Title Styling */
+.login-container h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: white; /* Make the title visible on dark background */
+}
+
+/* Form Styling */
+.login-container form {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+/* Input Fields */
+.login-container input {
+    width: 100%;
+    padding: 10px;
+    margin: 5px 0 15px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    outline: none;
+}
+
+.login-container input::placeholder {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* Button Styling */
+.login-container button {
+    width: 100%;
+    padding: 10px;
+    background: #ff7e5f;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: 0.3s ease;
+}
+
+.login-container button:hover {
+    background: #feb47b;
+}
