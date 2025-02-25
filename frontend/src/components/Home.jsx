@@ -13,7 +13,7 @@ function Home() {
     <div className="home-container">
       {/* Navigation Bar */}
       <nav className="navbar">
-        <h2 className="logo">Sportify</h2>
+        <h2 className="logo" onClick={() => navigate("/homepage")}>Sportify</h2> 
         <div className="nav-buttons">
           <button onClick={() => navigate("/homepage")}>Home</button>
           <button onClick={() => alert("Profile Clicked!")}>Profile</button>
@@ -23,8 +23,8 @@ function Home() {
 
       {/* Main Content */}
       <div className="content">
-        <h1>Welcome to the Home Page</h1>
-        <p>This is a simple homepage with a navigation bar.</p>
+        <h1>Welcome to the Sportify Page</h1>
+        <p>The Ultimate Football Feed Website.</p>
       </div>
     </div>
   );
