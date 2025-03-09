@@ -1,0 +1,120 @@
+/* Navbar Base Styling */
+.navbar {
+  background: #000000;
+  color: white;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  padding: 15px 30px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  display: flex;
+  justify-content: center;
+}
+
+/* Container */
+.navbar-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  max-width: 1300px;
+}
+
+/* Left Section */
+.navbar-left {
+  display: flex;
+  align-items: center;
+}
+
+/* Logo */
+.navbar-logo {
+  font-size: 1.8rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  color: white;
+  text-decoration: none;
+  margin-right: 20px;
+}
+
+/* Menu */
+.navbar-menu {
+  list-style: none;
+  display: flex;
+  gap: 25px;
+  margin: 0;
+  padding: 0;
+}
+
+/* Menu Links */
+.navbar-link {
+  text-decoration: none;
+  color: white;
+  font-size: 1rem;
+  font-weight: 500;
+  position: relative;
+  transition: color 0.3s ease;
+}
+
+/* Hover Effect */
+.navbar-link:hover {
+  color: #d4ff00;
+}
+
+/* Underline on Hover */
+.navbar-link:hover::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -5px;
+  width: 100%;
+  height: 2px;
+  background: #d4ff00;
+}
+
+/* Right Section */
+.navbar-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+/* Sign-in Button (Black with Border) */
+.navbar-button {
+  text-decoration: none;
+  background: black;
+  color: white;
+  padding: 8px 15px;
+  font-size: 1rem;
+  font-weight: bold;
+  border: 2px solid white;
+  border-radius: 4px;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+/* Sign-in Button Hover (White Background, Black Text) */
+.navbar-button:hover {
+  background: white;
+  color: black;
+}
+
+/* Join Button (White Background) */
+.navbar-button:last-child {
+  text-decoration: none;
+  background: black;
+  color: white;
+  padding: 8px 15px;
+  font-size: 1rem;
+  font-weight: bold;
+  border: 2px solid white;
+  border-radius: 4px;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+/* Join Button Hover */
+.navbar-button:last-child:hover {
+  background: #ffffff;
+  color:black;
+}

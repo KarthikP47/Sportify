@@ -1,0 +1,87 @@
+/* Ensures the entire page has a uniform background */
+html, body {
+    height: 100%;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(to bottom, #121212, #1e1e1e); /* Matches the dark theme */
+    color: white;
+}
+
+/* Centers the login form */
+.login-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 1010px;
+    height: 100vh; /* Full viewport height */
+}
+
+/* Adjusts the login box */
+.login-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: rgba(63, 63, 63, 0.199); /* Semi-transparent dark green */
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 1px 1px 5px 5px #00ff223b;
+    text-align: center;
+    width: 400px;
+    height: 400px;
+}
+.login-title {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #d4ff00; /* Neon Green */
+    margin-bottom: 1rem;
+  }
+/* Input Fields */
+.login-input {
+    width: 100%; /* Ensures it takes full width */
+    padding: 12px;
+    margin: 8px 0;
+    border: 1px solid #ffffff;
+    border-radius: 5px;
+    font-size: 16px;
+    box-sizing: border-box; /* Prevents padding from affecting width */
+    text-align: left; /* Align text properly */
+}
+
+/* Login Button */
+.login-button {
+    width: 100%;
+    padding: 12px;
+    background-color: #d4ff00;
+    color: rgb(0, 0, 0);
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background-color 0.3s ease;
+}
+
+.login-button:hover {
+    background-color: #04a51f;
+}
+
+/* Adjusts the text link */
+.switch-text {
+    padding-top: 20px;
+    margin-top: 12px;
+    font-size: 14px;
+}
+
+.switch-link {
+    color: #03db20;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.switch-link:hover {
+    text-decoration: underline;
+}
