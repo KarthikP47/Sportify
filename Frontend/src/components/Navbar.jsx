@@ -17,6 +17,9 @@ function Navbar() {
               <Link to="/live-scores" className="navbar-link">Matches</Link>
             </li>
             <li className="navbar-item">
+              <Link to="/fixtures" className="navbar-link">Fixtures</Link>
+            </li>
+            <li className="navbar-item">
               <Link to="/standings" className="navbar-link">League Standings</Link>
             </li>
             <li className="navbar-item">

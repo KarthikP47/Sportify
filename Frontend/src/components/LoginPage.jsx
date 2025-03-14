@@ -33,7 +33,7 @@ const LoginPage = () => { // ✅ Define the component
       navigate("/home");
     } catch (error) {
       console.error("Login error:", error);
-      alert("Server connection failed. Make sure the backend is running.");
+      alert("Invalid Credentials");
     }
   };
 

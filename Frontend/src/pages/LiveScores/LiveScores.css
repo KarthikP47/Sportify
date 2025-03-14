@@ -1,0 +1,127 @@
+/* Live Scores Container */
+.live-scores-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #121212; /* Dark background */
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  overflow-y: auto; /* Enable vertical scrolling */
+  max-height: 100vh; /* Full viewport height */
+}
+
+/* Hide scrollbar but keep scrolling functional */
+.live-scores-container::-webkit-scrollbar {
+  width: 0;
+  display: none;
+}
+
+.live-scores-container {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Header */
+.live-scores-header {
+  text-align: center;
+  font-size: 2.5rem;
+  color: #ffffff;
+  margin-bottom: 20px;
+  font-weight: 700;
+}
+
+/* League Sections */
+.league-container {
+  margin-bottom: 30px;
+}
+
+.league-name {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #ffcc00;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 3px solid #ffcc00;
+}
+
+/* Matches Grid */
+.matches-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3 matches per row */
+  gap: 15px;
+}
+
+/* Match Card */
+.match-card {
+  background: linear-gradient(145deg, #1e1e1e, #2a2a2a);
+  border-radius: 15px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  padding: 15px;
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+  cursor: pointer;
+}
+
+.match-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(255, 204, 0, 0.4);
+}
+
+/* Match Header */
+.match-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  font-size: 1rem;
+  color: #ffcc00;
+}
+
+/* Teams & Scores */
+.teams-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.team {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background-color: #000000;
+}
+
+.team-logo {
+  width: 30px; /* Smaller logo size */
+  height: 30px;
+  object-fit: contain; /* Ensure logos don't stretch */
+  background: none !important; /* Remove any background */
+  border: none !important; /* Remove any border */
+  padding: 0 !important; /* Remove any padding */
+  margin: 0 !important; /* Remove any margin */
+  outline: none !important; /* Remove any outline */
+  box-shadow: none !important; /* Remove any box shadow */
+}
+
+.team-name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #ffffff;
+  white-space: nowrap; /* Prevent team names from wrapping */
+  overflow: hidden; /* Hide overflow */
+  text-overflow: ellipsis; /* Add ellipsis for long names */
+}
+
+.score {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #ffcc00;
+}
+
+/* No Matches Message */
+.no-matches {
+  text-align: center;
+  font-size: 1.3rem;
+  color: #bbbbbb;
+  font-weight: 500;
+}

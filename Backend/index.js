@@ -120,34 +120,70 @@ app.get("/api/standings/:leagueId", async (req, res) => {
   }
 });
 
-// ✅ Live Matches API
+const getDateRange = () => {
+  const today = new Date();
+  const twoWeeksLater = new Date();
+  twoWeeksLater.setDate(today.getDate() + 14); // Add 14 days
+
+  const formatDate = (date) => date.toISOString().split('T')[0]; // Format as YYYY-MM-DD
+  return {
+      dateFrom: formatDate(today),
+      dateTo: formatDate(twoWeeksLater),
+  };
+};
+
+// Proxy endpoint to fetch fixtures for a specific competition
+app.get('/api/fixtures/:leagueId', async (req, res) => {
+  try {
+      const { leagueId } = req.params;
+      const { dateFrom, dateTo } = getDateRange(); // Get date range
+
+      const response = await axios.get(
+          `https://api.football-data.org/v4/competitions/${leagueId}/matches`,
+          {
+              headers: {
+                  'X-Auth-Token': process.env.FOOTBALL_API_KEY,
+              },
+              params: {
+                  dateFrom,
+                  dateTo,
+              },
+          }
+      );
+      res.json(response.data);
+  } catch (error) {
+      console.error('Error fetching fixtures:', error.message);
+      res.status(500).json({ error: 'Failed to fetch fixtures' });
+  }
+});
+
+// ✅ Live Matches API (Updated with correct endpoint)
 app.get("/api/live-matches", async (req, res) => {
   try {
     const url = "https://v3.football.api-sports.io/fixtures?live=all";
     const options = {
       method: "GET",
       headers: {
-        "x-rapidapi-key": process.env.FOOTBALL_API_KEY_K,
-        "x-rapidapi-host": "api-football-v1.p.rapidapi.com",
+        "x-rapidapi-key": process.env.LIVE_SCORES_API_KEY,
+        "x-rapidapi-host": process.env.LIVE_SCORES_API_HOST,
       },
     };
 
     const response = await axios.get(url, options);
     const allMatches = response.data.response || [];
 
-    console.log("Raw API Response:", allMatches); // Log the raw response
+    console.log("🔵 Raw API Response:", allMatches); // Log the raw response
 
-    const filteredMatches = allMatches.filter((match) =>
-      topLeagues.includes(match.league.id)
-    );
-
-    console.log("✅ Filtered Live Matches:", filteredMatches);
-    res.json(filteredMatches);
+    // Return all live matches globally
+    console.log("✅ All Live Matches:", allMatches);
+    res.json(allMatches);
   } catch (error) {
     console.error("❌ Error fetching live matches:", error.message);
+    console.error("🔴 API Response:", error.response?.data); // Log the API error response
     res.status(500).json({ message: "Failed to fetch live matches" });
   }
 });
+
 
 // ✅ Previous Matches API
 app.get("/api/previous-matches", async (req, res) => {

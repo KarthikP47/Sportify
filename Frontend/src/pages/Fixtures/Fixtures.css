@@ -1,0 +1,133 @@
+/* Global Styles for Fixtures Page */
+.fixtures-page {
+    font-family: Arial, sans-serif;
+    background-color: #000000; /* Dark background */
+    color: #ffffff; /* White text */
+    padding: 20px;
+    height: 100vh; /* Full viewport height */
+    width: 100vw;
+    overflow-y: auto; /* Enable vertical scrolling */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    scrollbar-width: none; /* Hide scrollbar for Firefox */
+  }
+  
+  .fixtures-page::-webkit-scrollbar {
+    display: none; /* Hide scrollbar for Chrome, Safari, and Edge */
+  }
+  
+  /* Fixtures Page League Buttons */
+  .fixtures-league-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    padding-top: 80px; /* Reduced padding to keep buttons at the top */
+    z-index: 5; /* Ensure buttons are above the header */
+    margin-top: 0; /* Remove margin-top to keep buttons at the top */
+    width: 100%; /* Ensure buttons span the full width */
+  }
+  
+  .fixtures-league-buttons button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 15px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    background: #222;
+    color: #fff;
+    font-size: 16px;
+    transition: background 0.3s, color 0.3s;
+  }
+  
+  .fixtures-league-buttons button:hover {
+    background: #fff;
+    color: #000;
+    transform: scale(1.05); /* Slightly scale up the button */
+    box-shadow: 0 4px 8px rgba(224, 248, 9, 0.877); /* Add a subtle shadow */
+  }
+  
+  /* Fixtures List */
+  .fixtures-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); /* Responsive grid layout */
+    gap: 20px;
+    width: 100%;
+    max-width: 1200px;
+    padding: 20px;
+  }
+  
+  /* Individual Fixture Items */
+  .fixture-item {
+    background: #222222;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    cursor: pointer;
+    min-width: 350px; /* Ensure minimum width */
+  }
+  
+  .fixture-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(255, 204, 0, 0.4);
+  }
+  
+  /* Fixture Teams */
+  .fixture-teams {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex: 1; /* Allow teams section to grow */
+    min-width: 0; /* Prevent flex overflow */
+  }
+  
+  .team {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .team-logo {
+    width: 30px;
+    height: 30px;
+    object-fit: contain;
+  }
+  
+  .team-name {
+    font-size: 1.1rem; /* Slightly reduce font size */
+    font-weight: bold;
+    white-space: nowrap; /* Prevent team names from wrapping */
+    overflow: hidden;
+    text-overflow: ellipsis; /* Add ellipsis for long names */
+    flex: 1; /* Allow team name to shrink */
+  }
+  
+  .vs {
+    font-size: 1rem;
+    color: #ffcc00;
+    text-align: center;
+  }
+  
+  /* Fixture Date and Time */
+  .fixture-date-time {
+    text-align: right;
+    font-size: 0.9rem;
+    color: #bbbbbb;
+    white-space: nowrap; /* Prevent date/time from wrapping */
+    margin-left: 10px; /* Add spacing between teams and date/time */
+    flex-shrink: 0; /* Prevent date/time from shrinking */
+  }
+  
+  /* No Fixtures Message */
+  .no-fixtures {
+    text-align: center;
+    font-size: 1.3rem;
+    color: #bbbbbb;
+    font-weight: 500;
+  }

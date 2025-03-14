@@ -3,12 +3,13 @@ import Navbar from "./components/Navbar";  // Import Navbar
 import HomePage from "./components/HomePage";
 import LoginPage from "./components/LoginPage";
 import SignPage from "./components/SignPage";
-import LiveScores from "./pages/LiveScores";
-import Standings from "./pages/Standings";
+import LiveScores from "./pages/LiveScores/LiveScores";
+import Standings from "./pages/Standings/Standings";
 import TransferMarket from "./pages/TransferMarket";
 import Rumors from "./pages/Rumors";
 import CommunityForum from "./pages/CommunityForum";
-import MatchDetails from "./pages/MatchDetails"; // Import the new MatchDetails component
+import MatchDetails from "./pages/MatchDetails/MatchDetails";
+import Fixtures from "./pages/Fixtures/Fixtures"
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
         <Route path="/forum" element={<CommunityForum />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignPage />} />
+        <Route path="/fixtures" element={<Fixtures />} />
         <Route path="/match-details/:fixtureId" element={<MatchDetails />} /> {/* Add route for match details */}
       </Routes>
     </Router>
