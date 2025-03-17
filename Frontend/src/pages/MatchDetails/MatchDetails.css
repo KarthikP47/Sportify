@@ -1,118 +1,270 @@
-/* Match Details Styles */
+/* General Styles */
 .match-details-container {
-  max-width: 1200px;
-  margin: 0 auto;
+  background: #000000;
+  color: #fff;
+  font-family: "Arial", sans-serif;
   padding: 20px;
-  background-color: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  width:100vw;
+  height:100vh;
+  margin: auto;
+  overflow-y: auto;
+  overflow-x: auto;
+   /* Ensures scrolling is available when needed */
+  position: relative;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
-
-/* Match Header */
-.match-header {
-  text-align: center;
-  margin-bottom: 30px;
+.match-details-scoreboard {
+  
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding-top: 20px;
 }
-
-.match-title {
-  font-size: 2rem;
-  color: #333;
-  margin-bottom: 10px;
-  font-weight: 600;
+.match-details-team {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
-
-.match-score {
-  font-size: 3rem;
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 10px;
+.match-details-team-logo {
+  width: 40px;
+  height: 40px;
 }
-
-.match-status {
-  font-size: 1.2rem;
-  color: #666;
+.match-details-team-name {
+  font-size: 18px;
+  font-weight: bold;
+  white-space: nowrap;
 }
-
-/* Match Events */
-.match-events {
-  margin-bottom: 30px;
+.match-details-score {
+  justify-content: center;
+  align-items: center;
+  font-size: 36px;
+  font-weight: bold;
+  color: #f1c40f;
 }
-
-.match-events h2 {
-  font-size: 1.5rem;
-  color: #333;
-  margin-bottom: 10px;
-  font-weight: 600;
+.match-details-container::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
 }
-
-.events-table {
-  width: 100%;
-  border-collapse: collapse;
-  background-color: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.events-table th,
-.events-table td {
-  padding: 10px;
-  text-align: left;
-  border-bottom: 1px solid #e0e0e0;
-}
-
-.events-table th {
-  background-color: #f4f4f9;
-  font-weight: 600;
-  color: #333;
-}
-
-.event-row:hover {
-  background-color: #f9f9f9;
-}
-
-/* Teams and Lineups */
-.teams-container {
+.match-details-substitutes-coaches-container {
   display: flex;
   justify-content: space-between;
   gap: 20px;
+  margin-top: 20px;
+}
+.match-details-team-section {
+  flex: 1;
+  background: #292929;
+  padding: 15px;
+  border-radius: 10px;
+  text-align: center;
+}
+.match-details-substitutes-list {
+  list-style-type: none;
+  padding: 0;
+}
+.match-details-substitutes-list li {
+  padding: 5px;
+  background: #333;
+  margin-top: 5px;
+  border-radius: 5px;
+  text-align: center;
+}
+/* Match Header */
+.match-details-statistics-container {
+  background: #292929;
+  padding: 15px;
+  border-radius: 10px;
+  text-align: center;
+  margin-top: 20px;
 }
 
-.team {
+.match-details-statistics-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.match-details-statistic {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #333;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.match-details-stat-type {
+  font-size: 18px;
+  font-weight: bold;
   flex: 1;
   text-align: center;
-  background-color: #222222;
-  border-radius: 8px;
-  padding: 20px;
 }
 
-.team h3 {
-  font-size: 1.5rem;
-  color: #333;
+.match-details-stat-value {
+  font-size: 16px;
+  font-weight: bold;
+  width: 80px;
+  text-align: center;
+}
+.match-details-status {
+  display: flex;
+  justify-content: center; /* Centers horizontally */
+  align-items: center; /* Centers vertically */
+  margin-top: 10px;
+  font-size: 18px;
+  font-weight: bold;
+  text-align: center; /* Ensures text is centered */
+}
+
+
+.match-title {
+  font-size: 24px;
+  font-weight: bold;
   margin-bottom: 10px;
-  font-weight: 600;
+}
+
+.match-score {
+  font-size: 40px;
+  font-weight: bold;
+  color: #f1c40f;
+}
+
+.match-status {
+  font-size: 20px;
+  color: #bbb;
+  margin-top: 10px;
+}
+
+/* Match Overview */
+.match-overview {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.match-overview-left,
+.match-overview-right {
+  flex:3;
+}
+
+.match-time {
+  font-size: 18px;
+  font-weight: bold;
+  color: #f1c40f;
+}
+
+.match-events {
+  margin-top: 10px;
+}
+
+.event {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  background: #222;
+  border-radius: 5px;
+  margin-bottom: 5px;
+}
+
+/* Lineups */
+.lineups-container {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.lineup {
+  flex: 1;
+  background: #292929;
+  padding: 15px;
+  border-radius: 10px;
+  text-align: center;
 }
 
 .team-logo {
-  width: 100px;
-  height: 100px;
-  margin-bottom: 10px;
+  width: 50px;
+  height: 50px;
 }
 
-.players-list {
+.formation-container {
+  margin-top: 10px;
+}
+
+.player {
+  display: flex;
+  justify-content: space-between;
+  font-size: 16px;
+  background: #333;
+  padding: 5px;
+  border-radius: 5px;
+  margin-top: 5px;
+}
+
+/* Substitutes & Coaches */
+.substitutes-coaches-container {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.substitutes-container,
+.coach-section {
+  flex: 1;
+  background: #292929;
+  padding: 15px;
+  border-radius: 10px;
+}
+
+.substitutes-list {
   list-style-type: none;
   padding: 0;
 }
 
-.player-item {
+.substitutes-list li {
   padding: 5px;
-  border-bottom: 1px solid #e0e0e0;
-  color: #333;
+  background: #333;
+  margin-top: 5px;
+  border-radius: 5px;
 }
 
-/* Loading and Error States */
-.loading,
-.error {
-  text-align: center;
-  font-size: 1.2rem;
-  color: #666;
+/* Statistics */
+.statistics-container {
+  margin-top: 20px;
+  background: #292929;
+  padding: 15px;
+  border-radius: 10px;
+}
+
+.statistics-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.statistic {
+  display: flex;
+  justify-content: space-between;
+  background: #333;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .match-overview {
+    flex-direction: column;
+  }
+
+  .lineups-container,
+  .substitutes-coaches-container {
+    flex-direction: column;
+  }
 }

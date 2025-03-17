@@ -5,14 +5,17 @@ import LoginPage from "./components/LoginPage";
 import SignPage from "./components/SignPage";
 import LiveScores from "./pages/LiveScores/LiveScores";
 import Standings from "./pages/Standings/Standings";
-import TransferMarket from "./pages/TransferMarket";
-import Rumors from "./pages/Rumors";
+import TransferMarket from "./pages/TransferMarket/TransferMarket";
+import Rumors from "./pages/Rumors/Rumors";
 import CommunityForum from "./pages/CommunityForum";
 import MatchDetails from "./pages/MatchDetails/MatchDetails";
 import Fixtures from "./pages/Fixtures/Fixtures"
+import { AuthProvider } from "./components/AuthContext";
+
 
 function App() {
   return (
+    <AuthProvider>
     <Router>
       <Navbar /> {/* Add the Navbar here */}
       <Routes>
@@ -29,6 +32,7 @@ function App() {
         <Route path="/match-details/:fixtureId" element={<MatchDetails />} /> {/* Add route for match details */}
       </Routes>
     </Router>
+    </AuthProvider>
   );
 }
 

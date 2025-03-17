@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "./LoginPage.css"; // Ensure the CSS file is correctly imported
+import "./LoginPage.css";
 
-const LoginPage = () => { // ✅ Define the component
+const LoginPage = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -28,7 +28,10 @@ const LoginPage = () => { // ✅ Define the component
 
       const data = await response.json();
 
+      // Store token and user data in localStorage
       localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user)); // Assuming backend returns user data
+
       alert("Login Successful!");
       navigate("/home");
     } catch (error) {
@@ -71,4 +74,4 @@ const LoginPage = () => { // ✅ Define the component
   );
 };
 
-export default LoginPage; // ✅ Ensure this is here
+export default LoginPage;

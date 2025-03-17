@@ -156,6 +156,25 @@ app.get('/api/fixtures/:leagueId', async (req, res) => {
       res.status(500).json({ error: 'Failed to fetch fixtures' });
   }
 });
+app.get("/api/rumors", async (req, res) => {
+  try {
+    const response = await axios.get(process.env.NEWS_API_URL, {
+      params: {
+        q: "football OR soccer", // Only fetch football/soccer-related news
+        apiKey: process.env.NEWS_API_KEY, // Use NEWS_API_KEY from .env
+        pageSize: 50, // Limit the number of results
+        language: "en", // Fetch English articles only
+        sortBy: "publishedAt", // Sort by latest news
+      },
+    });
+
+    // Send all football-related news to the frontend
+    res.json(response.data.articles);
+  } catch (error) {
+    console.error("Error fetching news:", error.message);
+    res.status(500).json({ error: "Failed to fetch news" });
+  }
+});
 
 // ✅ Live Matches API (Updated with correct endpoint)
 app.get("/api/live-matches", async (req, res) => {
@@ -179,63 +198,7 @@ app.get("/api/live-matches", async (req, res) => {
     res.json(allMatches);
   } catch (error) {
     console.error("❌ Error fetching live matches:", error.message);
-    console.error("🔴 API Response:", error.response?.data); // Log the API error response
     res.status(500).json({ message: "Failed to fetch live matches" });
-  }
-});
-
-
-// ✅ Previous Matches API
-app.get("/api/previous-matches", async (req, res) => {
-  try {
-    const url = "https://v3.football.api-sports.io/fixtures?status=FT&last=10";
-    const options = {
-      method: "GET",
-      headers: {
-        "x-rapidapi-key": process.env.FOOTBALL_API_KEY_K,
-        "x-rapidapi-host": "api-football-v1.p.rapidapi.com",
-      },
-    };
-
-    const response = await axios.get(url, options);
-    const allMatches = response.data.response || [];
-
-    const filteredMatches = allMatches.filter((match) =>
-      topLeagues.includes(match.league.id)
-    );
-
-    console.log("✅ Filtered Previous Matches:", filteredMatches);
-    res.json(filteredMatches);
-  } catch (error) {
-    console.error("❌ Error fetching previous matches:", error.message);
-    res.status(500).json({ message: "Failed to fetch previous matches" });
-  }
-});
-
-// ✅ Upcoming Matches API
-app.get("/api/upcoming-matches", async (req, res) => {
-  try {
-    const url = "https://v3.football.api-sports.io/fixtures?status=NS&next=10";
-    const options = {
-      method: "GET",
-      headers: {
-        "x-rapidapi-key": process.env.FOOTBALL_API_KEY_K,
-        "x-rapidapi-host": "api-football-v1.p.rapidapi.com",
-      },
-    };
-
-    const response = await axios.get(url, options);
-    const allMatches = response.data.response || [];
-
-    const filteredMatches = allMatches.filter((match) =>
-      topLeagues.includes(match.league.id)
-    );
-
-    console.log("✅ Filtered Upcoming Matches:", filteredMatches);
-    res.json(filteredMatches);
-  } catch (error) {
-    console.error("❌ Error fetching upcoming matches:", error.message);
-    res.status(500).json({ message: "Failed to fetch upcoming matches" });
   }
 });
 
@@ -248,15 +211,19 @@ app.get("/api/match-details/:fixtureId", async (req, res) => {
     const options = {
       method: "GET",
       headers: {
-        "x-rapidapi-key": process.env.FOOTBALL_API_KEY_K,
-        "x-rapidapi-host": "api-football-v1.p.rapidapi.com",
+        "x-rapidapi-key": process.env.LIVE_SCORES_API_KEY,
+        "x-rapidapi-host": process.env.LIVE_SCORES_API_HOST,
       },
     };
 
+    console.log("🔵 Fetching match details from external API...");
     const response = await axios.get(url, options);
+    console.log("🔵 External API Response:", response.data);
+
     const matchDetails = response.data.response[0];
 
     if (!matchDetails) {
+      console.log("🔴 No match details found for fixture ID:", fixtureId);
       return res.status(404).json({ message: "Match details not found" });
     }
 
@@ -264,6 +231,7 @@ app.get("/api/match-details/:fixtureId", async (req, res) => {
     const lineupUrl = `https://v3.football.api-sports.io/fixtures/lineups?fixture=${fixtureId}`;
     const eventsUrl = `https://v3.football.api-sports.io/fixtures/events?fixture=${fixtureId}`;
 
+    console.log("🔵 Fetching lineups and events...");
     const [lineupResponse, eventsResponse] = await Promise.all([
       axios.get(lineupUrl, options),
       axios.get(eventsUrl, options),
@@ -273,9 +241,11 @@ app.get("/api/match-details/:fixtureId", async (req, res) => {
     matchDetails.lineups = lineupResponse.data.response || [];
     matchDetails.events = eventsResponse.data.response || [];
 
+    console.log("✅ Match details fetched successfully:", matchDetails);
     res.json(matchDetails);
   } catch (error) {
     console.error("❌ Error fetching match details:", error.message);
+    console.error("🔴 API Response:", error.response?.data);
     res.status(500).json({ message: "Failed to fetch match details" });
   }
 });

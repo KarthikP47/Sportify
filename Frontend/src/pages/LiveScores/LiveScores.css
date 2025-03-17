@@ -1,9 +1,14 @@
 /* Live Scores Container */
+.body, html{
+  background-color: #000000;
+  color: #000000;
+}
 .live-scores-container {
-  max-width: 1200px;
+  width: 100vw;
+  height: 100vh;
   margin: 0 auto;
   padding: 20px;
-  background-color: #121212; /* Dark background */
+  background-color: #000000; /* Dark background */
   border-radius: 12px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
   overflow-y: auto; /* Enable vertical scrolling */
@@ -30,65 +35,76 @@
   font-weight: 700;
 }
 
-/* League Sections */
-.league-container {
+/* Competition Sections */
+.competition-container {
   margin-bottom: 30px;
 }
 
-.league-name {
+.competition-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.competition-logo {
+  width: 30px;
+  height: 30px;
+  margin-right: 10px;
+  background-color: #ffffff;
+  border-radius: 100%;
+}
+
+.competition-name {
   font-size: 1.6rem;
   font-weight: 700;
   color: #ffcc00;
-  margin-bottom: 15px;
-  padding-bottom: 10px;
-  border-bottom: 3px solid #ffcc00;
 }
-
 /* Matches Grid */
 .matches-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr); /* 3 matches per row */
-  gap: 15px;
+  gap: 10px; /* Reduce the gap between cards */
 }
+
 
 /* Match Card */
 .match-card {
-  background: linear-gradient(145deg, #1e1e1e, #2a2a2a);
+  background: #222222;
   border-radius: 15px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-  padding: 15px;
+  padding: 10px; /* Reduce padding inside the card */
   transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
   cursor: pointer;
+  height: auto;
+  width: 300px; /* Ensure height is auto to fit content */
 }
-
 .match-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 10px 20px rgba(255, 204, 0, 0.4);
 }
+
 
 /* Match Header */
 .match-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 10px;
-  font-size: 1rem;
+  margin-bottom: 8px; /* Reduce margin */
+  font-size: 0.9rem; /* Slightly reduce font size */
   color: #ffcc00;
 }
 
 /* Teams & Scores */
 .teams-container {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
+  flex-direction: column; /* Stack team rows vertically */
+  gap: 10px; /* Add spacing between team rows */
 }
 
 .team {
   display: flex;
   align-items: center;
   gap: 10px;
-  background-color: #000000;
 }
 
 .team-logo {
@@ -106,7 +122,7 @@
 .team-name {
   font-size: 1rem;
   font-weight: 600;
-  color: #ffffff;
+  color: #ffffff; /* White text for better visibility */
   white-space: nowrap; /* Prevent team names from wrapping */
   overflow: hidden; /* Hide overflow */
   text-overflow: ellipsis; /* Add ellipsis for long names */
@@ -116,8 +132,48 @@
   font-size: 1.5rem;
   font-weight: 700;
   color: #ffcc00;
+  margin-left: auto; /* Push the score to the right */
+}
+.league-buttons {
+  display: flex;
+  justify-content: center; /* Center buttons horizontally */
+  gap: 10px;
+  padding: 10px; /* Add some space from the top */
+  z-index: 5; /* Ensure buttons are above other elements */
+  margin-top: 0; /* Remove additional spacing */
+  width: 80%;
+  background-color: #000; 
+  padding-top: 100px;/* Match background color */
 }
 
+.league-button {
+  display: flex;
+  align-items: center;
+  padding: 10px 20px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #ffffff;
+  background-color: #333333;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.league-button:hover {
+  background-color: #555555;
+}
+
+.league-button.active {
+  background-color: #ffcc00;
+  color: #121212;
+}
+
+.league-button-logo {
+  width: 20px;
+  height: 20px;
+  margin-right: 10px;
+}
 /* No Matches Message */
 .no-matches {
   text-align: center;

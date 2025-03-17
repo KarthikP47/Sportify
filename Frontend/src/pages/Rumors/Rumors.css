@@ -1,0 +1,68 @@
+/* Rumors.css */
+@import url('https://fonts.googleapis.com/css2?family=Bungee&display=swap');
+
+.rumors-market {
+    padding: 20px;
+    font-family: Arial, sans-serif;
+    margin: 0 auto;
+    padding-top: 70px;
+    width: 100vw;
+    height: 100vh; /* Add padding to account for the navbar */
+    background-color: #000000; /* Light background for better readability */
+  }
+  
+  .rumors-market h2 {
+    font-family: 'Bungee';
+    font-size: 50px;
+    margin-bottom: 20px;
+    text-align: center;
+    color: #e5ff00; 
+    padding: 20px;
+  }
+  .news-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Responsive grid */
+    gap: 20px; /* Space between grid items */
+    padding: 20px;
+  }
+  
+  .news-item {
+    background-color: #ffffff; /* White background for cards */
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .news-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+  
+  .news-item h3 {
+    font-size: 18px;
+    margin: 0 0 10px;
+    color: #007bff; /* Blue color for headlines */
+  }
+  
+  .news-item p {
+    font-size: 14px;
+    color: #555; /* Gray text color */
+    margin: 5px 0;
+  }
+  
+  .news-image {
+    width: 100%;
+    max-height: 200px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-top: 10px;
+  }
+  
+  .news-source {
+    font-size: 12px;
+    color: #888; /* Light gray for source text */
+    margin-top: auto; /* Push source to the bottom of the card */
+  }

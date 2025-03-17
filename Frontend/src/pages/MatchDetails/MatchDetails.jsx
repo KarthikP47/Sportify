@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import "./MatchDetails.css"; // Import the CSS file for styling
+import "./MatchDetails.css";
 
 const MatchDetails = () => {
-  const { fixtureId } = useParams(); // Get the fixture ID from the URL
+  const { fixtureId } = useParams();
   const [matchDetails, setMatchDetails] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Function to fetch match details
   const fetchMatchDetails = async () => {
     try {
       const response = await fetch(
@@ -16,10 +15,15 @@ const MatchDetails = () => {
       );
 
       if (!response.ok) {
-        throw new Error("Failed to fetch match details");
+        if (response.status === 404) {
+          throw new Error("Match details not found");
+        } else {
+          throw new Error("Failed to fetch match details");
+        }
       }
 
       const data = await response.json();
+      console.log("🔵 Backend Response:", data); // Log the backend response
       setMatchDetails(data);
     } catch (err) {
       setError(err.message);
@@ -28,15 +32,8 @@ const MatchDetails = () => {
     }
   };
 
-  // Fetch match details on component mount and set up polling
   useEffect(() => {
-    fetchMatchDetails(); // Initial fetch
-
-    // Poll the API every 10 seconds for live updates
-    const intervalId = setInterval(fetchMatchDetails, 10000);
-
-    // Cleanup interval on component unmount
-    return () => clearInterval(intervalId);
+    fetchMatchDetails();
   }, [fixtureId]);
 
   if (loading) {
@@ -51,103 +48,161 @@ const MatchDetails = () => {
     return <div className="error">No match details available.</div>;
   }
 
-  // Sort events by time elapsed
-  const sortedEvents = matchDetails.events
-    ? matchDetails.events.sort((a, b) => a.time.elapsed - b.time.elapsed)
-    : [];
-
   return (
     <div className="match-details-container">
       {/* Match Header */}
-      <div className="match-header">
-        <h1 className="match-title">
-          {matchDetails.teams.home.name} vs {matchDetails.teams.away.name}
-        </h1>
-        <div className="match-score">
-          {matchDetails.goals.home} : {matchDetails.goals.away}
+      <div className="match-details-header">
+        <div className="match-details-league">{matchDetails.league.name}</div>
+        <div className="match-details-scoreboard">
+          <div className="match-details-team">
+            <img
+              src={matchDetails.teams.home.logo}alt={matchDetails.teams.home.name}className="team-logo"
+            />
+            <span className="match-details-team-name">{matchDetails.teams.home.name}</span>
+          </div>
+          <span className="match-details-score">{matchDetails.goals.home} : {matchDetails.goals.away}</span>
+          <div className="match-details-team">
+            <img
+               src={matchDetails.teams.away.logo}
+               alt={matchDetails.teams.away.name}
+               className="team-logo"
+            />
+            <span className="match-details-team-name">
+            {matchDetails.teams.away.name}
+            </span>
+          </div>
         </div>
-        <div className="match-status">{matchDetails.fixture.status.long}</div>
+        <div className="match-details-status">
+          <span className="match-details-live">{matchDetails.fixture.status.elapsed}</span>
+        </div>
+      </div>
+      {/* Match Overview (yest1.png) */}
+      <div className="match-overview">
+        <div className="match-overview-left">
+          <div className="match-time">
+            <span>{new Date(matchDetails.fixture.date).toLocaleString()}</span>
+          </div>
+          <div className="match-events">
+            {matchDetails.events && matchDetails.events.length > 0 ? (
+              matchDetails.events.map((event, index) => (
+                <div key={index} className="event">
+                  <span>{event.time.elapsed}'</span>
+                  <span>{event.player.name}</span>
+                  <span>{event.type}</span>
+                </div>
+              ))
+            ) : (
+              <p>No events available.</p>
+            )}
+          </div>
+        </div>
+        <div className="match-overview-right">
+          <div className="lineups-container">
+            {/* Home Team Lineup */}
+            <div className="lineup home-lineup">
+              <h3>{matchDetails.teams.home.name}</h3>
+              <img
+                src={matchDetails.teams.home.logo}
+                alt={matchDetails.teams.home.name}
+                className="team-logo"
+              />
+              <div className="formation-container">
+                {matchDetails.lineups && matchDetails.lineups[0] ? (
+                  matchDetails.lineups[0].startXI.map((player, index) => (
+                    <div key={index} className="player">
+                      <span>{player.player.name}</span>
+                      <span>({player.player.number})</span>
+                    </div>
+                  ))
+                ) : (
+                  <p>No lineup available.</p>
+                )}
+              </div>
+            </div>
+
+            {/* Away Team Lineup */}
+            <div className="lineup away-lineup">
+              <h3>{matchDetails.teams.away.name}</h3>
+              <img
+                src={matchDetails.teams.away.logo}
+                alt={matchDetails.teams.away.name}
+                className="team-logo"
+              />
+              <div className="formation-container">
+                {matchDetails.lineups && matchDetails.lineups[1] ? (
+                  matchDetails.lineups[1].startXI.map((player, index) => (
+                    <div key={index} className="player">
+                      <span>{player.player.name}</span>
+                      <span>({player.player.number})</span>
+                    </div>
+                  ))
+                ) : (
+                  <p>No lineup available.</p>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* Match Events */}
-      <div className="match-events">
-        <h2>Match Events</h2>
-        <table className="events-table">
-          <thead>
-            <tr>
-              <th>Time</th>
-              <th>Type</th>
-              <th>Detail</th>
-              <th>Player</th>
-            </tr>
-          </thead>
-          <tbody>
-            {sortedEvents.length > 0 ? (
-              sortedEvents.map((event) => (
-                <tr
-                  key={`${event.time.elapsed}-${event.type}`}
-                  className="event-row"
-                >
-                  <td>{event.time.elapsed}'</td>
-                  <td>{event.type}</td>
-                  <td>{event.detail}</td>
-                  <td>{event.player?.name || "-"}</td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="4">No events available.</td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+      {/* Substitutes and Coaches (yest2.png) */}
+      <div className="match-details-substitutes-coaches-container">
+  {/* Home Team Substitutes & Coach */}
+  <div className="match-details-team-section">
+    <h4>{matchDetails.teams.home.name} Substitutes</h4>
+    <ul className="match-details-substitutes-list">
+      {matchDetails.lineups && matchDetails.lineups[0]?.substitutes ? (
+        matchDetails.lineups[0].substitutes.map((player) => (
+          <li key={player.player.id}>
+            {player.player.name} ({player.player.number})
+          </li>
+        ))
+      ) : (
+        <li>No substitutes available.</li>
+      )}
+    </ul>
+    <h4>Coach</h4>
+    <p>{matchDetails.lineups[0]?.coach?.name || "Unknown"}</p>
+  </div>
 
-      {/* Teams and Lineups */}
-      <div className="teams-container">
-        <div className="team">
-          <h3>{matchDetails.teams.home.name}</h3>
-          <img
-            src={matchDetails.teams.home.logo}
-            alt={matchDetails.teams.home.name}
-            className="team-logo"
-          />
-          <ul className="players-list">
-            {matchDetails.lineups &&
-            matchDetails.lineups[0] &&
-            matchDetails.lineups[0].startXI ? (
-              matchDetails.lineups[0].startXI.map((player) => (
-                <li key={player.player.id} className="player-item">
-                  {player.player.name}
-                </li>
-              ))
-            ) : (
-              <li>No lineup available.</li>
-            )}
-          </ul>
+  {/* Away Team Substitutes & Coach */}
+  <div className="match-details-team-section">
+    <h4>{matchDetails.teams.away.name} Substitutes</h4>
+    <ul className="match-details-substitutes-list">
+      {matchDetails.lineups && matchDetails.lineups[1]?.substitutes ? (
+        matchDetails.lineups[1].substitutes.map((player) => (
+          <li key={player.player.id}>
+            {player.player.name} ({player.player.number})
+          </li>
+        ))
+      ) : (
+        <li>No substitutes available.</li>
+      )}
+    </ul>
+    <h4>Coach</h4>
+    <p>{matchDetails.lineups[1]?.coach?.name || "Unknown"}</p>
+  </div>
+</div>
+      {/* Statistics (yest3.png) */}
+      <div className="match-details-statistics-container">
+  <h4>Statistics</h4>
+  <div className="match-details-statistics-grid">
+    {/* Iterate through each statistic type and display values for both teams */}
+    {matchDetails.statistics && matchDetails.statistics[0]?.statistics.map((stat, index) => {
+      const awayStat = matchDetails.statistics[1]?.statistics.find(
+        (awayStat) => awayStat.type === stat.type
+      );
+
+      return (
+        <div key={index} className="match-details-statistic">
+          <span className="match-details-stat-value">{stat.value || "N/A"}</span>
+          <span className="match-details-stat-type">{stat.type}</span>
+          <span className="match-details-stat-value">{awayStat?.value || "N/A"}</span>
         </div>
-        <div className="team">
-          <h3>{matchDetails.teams.away.name}</h3>
-          <img
-            src={matchDetails.teams.away.logo}
-            alt={matchDetails.teams.away.name}
-            className="team-logo"
-          />
-          <ul className="players-list">
-            {matchDetails.lineups &&
-            matchDetails.lineups[1] &&
-            matchDetails.lineups[1].startXI ? (
-              matchDetails.lineups[1].startXI.map((player) => (
-                <li key={player.player.id} className="player-item">
-                  {player.player.name}
-                </li>
-              ))
-            ) : (
-              <li>No lineup available.</li>
-            )}
-          </ul>
-        </div>
-      </div>
+      );
+    })}
+  </div>
+</div>
     </div>
   );
 };

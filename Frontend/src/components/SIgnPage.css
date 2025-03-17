@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Big+Shoulders+Stencil:opsz,wght@10..72,100..900&display=swap');
+
 /* Ensures the entire page has a uniform background */
 html, body {
     height: 100%;
@@ -33,9 +35,10 @@ html, body {
     height: 400px;
 }
 .login-title {
+    font-family: 'Big Shoulders Stencil', sans-serif;
     font-size: 2rem;
     font-weight: bold;
-    color: #b8da10; /* Neon Green */
+    color: #ccf112; /* Neon Green */
     margin-bottom: 1rem;
   }
 /* Input Fields */
@@ -45,6 +48,7 @@ html, body {
     margin: 8px 0;
     border: 1px solid #ffffff;
     border-radius: 5px;
+    font-family: "Big Shoulders Stencil", sans-serif;
     font-size: 16px;
     box-sizing: border-box; /* Prevents padding from affecting width */
     text-align: left; /* Align text properly */
@@ -56,7 +60,8 @@ html, body {
     padding: 12px;
     background-color: #b6d324;
     color: rgb(0, 0, 0);
-    font-size: 16px;
+    font-family: 'Big Shoulders Stencil', sans-serif;
+    font-size: 20px;
     font-weight: bold;
     border: none;
     border-radius: 5px;

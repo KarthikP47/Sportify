@@ -1,16 +1,20 @@
 import { Link } from "react-router-dom";
-import "./Navbar.css"; // Import the CSS file for styling
+import "./Navbar.css";
 import { IoIosFootball } from "react-icons/io";
+import { useContext } from "react";
+import { AuthContext } from "./AuthContext";
 
 function Navbar() {
+  const { isLoggedIn, user, logout } = useContext(AuthContext);
+
   return (
     <nav className="navbar">
       <div className="navbar-container">
         {/* Left Section - Logo & Menu */}
         <div className="navbar-left">
-        <Link to="/home" className="navbar-logo flex items-center">
-               Sp<span className="relative top-[-2px]"><IoIosFootball /></span>rtify
-            </Link>
+          <Link to="/home" className="navbar-logo flex items-center">
+            Sp<span className="relative top-[-2px]"><IoIosFootball /></span>rtify
+          </Link>
 
           <ul className="navbar-menu">
             <li className="navbar-item">
@@ -34,10 +38,23 @@ function Navbar() {
           </ul>
         </div>
 
-        {/* Right Section - Login & Sign Up */}
+        {/* Right Section - Profile or Login/Join */}
         <div className="navbar-right">
-          <Link to="/login" className ="navbar-button">Sign-in</Link>
-          <Link to="/signup" className="navbar-button">Join</Link>
+          {isLoggedIn ? (
+            <div className="navbar-profile">
+              <Link to="/profile" className="navbar-button">
+                {user?.username}
+              </Link>
+              <button onClick={logout} className="navbar-button">
+                Logout
+              </button>
+            </div>
+          ) : (
+            <>
+              <Link to="/login" className="navbar-button">Sign-in</Link>
+              <Link to="/signup" className="navbar-button">Join</Link>
+            </>
+          )}
         </div>
       </div>
     </nav>
