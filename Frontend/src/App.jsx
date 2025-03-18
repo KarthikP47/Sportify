@@ -5,19 +5,25 @@ import LoginPage from "./components/LoginPage";
 import SignPage from "./components/SignPage";
 import LiveScores from "./pages/LiveScores/LiveScores";
 import Standings from "./pages/Standings/Standings";
-import TransferMarket from "./pages/TransferMarket/TransferMarket";
-import Rumors from "./pages/Rumors/Rumors";
+import TransferMarket from "./pages/TransferMarket";
+import Rumors from "./pages/Rumors";
 import CommunityForum from "./pages/CommunityForum";
 import MatchDetails from "./pages/MatchDetails/MatchDetails";
 import Fixtures from "./pages/Fixtures/Fixtures"
-import { AuthProvider } from "./components/AuthContext";
-
+import Posts from "./pages/Posts/Posts";
+import { isAuthenticated, removeToken } from "../utils/auth";
 
 function App() {
   return (
-    <AuthProvider>
     <Router>
       <Navbar /> {/* Add the Navbar here */}
+      <nav>
+        {isAuthenticated() ? (
+          <>
+            <button onClick={() => { removeToken(); window.location.href = '/'; }}>Logout</button>
+          </>
+        ) : null}
+      </nav>
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/home" element={<HomePage />} />  {/* ✅ Homepage as Default */}
@@ -25,14 +31,13 @@ function App() {
         <Route path="/standings" element={<Standings />} />
         <Route path="/transfers" element={<TransferMarket />} />
         <Route path="/rumors" element={<Rumors />} />
-        <Route path="/forum" element={<CommunityForum />} />
+        <Route path="/forum" element={<Posts />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignPage />} />
         <Route path="/fixtures" element={<Fixtures />} />
         <Route path="/match-details/:fixtureId" element={<MatchDetails />} /> {/* Add route for match details */}
       </Routes>
     </Router>
-    </AuthProvider>
   );
 }
 
