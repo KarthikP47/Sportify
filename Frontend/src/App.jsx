@@ -12,20 +12,11 @@ import Fixtures from "./pages/Fixtures/Fixtures"
 import { AuthProvider } from "./components/AuthContext";
 import ProfilePage from "./components/ProfilePage";
 import Posts from "./pages/Posts/Posts"
-import { isAuthenticated, removeToken } from "../utils/auth";
-
 function App() {
   return (
     <AuthProvider>
     <Router>
       <Navbar /> {/* Add the Navbar here */}
-      <nav>
-              {isAuthenticated() ? (
-                <>
-                  <button onClick={() => { removeToken(); window.location.href = '/'; }}>Logout</button>
-                </>
-              ) : null}
-            </nav>
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/home" element={<HomePage />} />  
