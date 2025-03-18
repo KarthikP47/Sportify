@@ -116,14 +116,13 @@ const topLeagues = [
 
   return (
     <div className="live-scores-container">
-      <h1 className="live-scores-header">Live Scores</h1>
 
       {/* Top 5 League Buttons and Others Button */}
-      <div className="league-buttons">
+      <div className="live-league-buttons">
         {topLeagues.map((league) => (
           <button
             key={league.id}
-            className={`league-button ${
+            className={`live-league-button ${
               selectedLeague === league.id ? "active" : ""
             }`}
             onClick={() => handleLeagueClick(league.id)}
@@ -138,7 +137,7 @@ const topLeagues = [
           </button>
         ))}
         <button
-          className={`league-button ${
+          className={`live-league-button ${
             selectedLeague === "others" || !selectedLeague ? "active" : ""
           }`}
           onClick={() => setSelectedLeague("others")} // Show other leagues or all leagues

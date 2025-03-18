@@ -4,7 +4,8 @@
   color: #000000;
 }
 .live-scores-container {
-  width: 100vw;
+  width: 100%;
+  max-width: 1200px;
   height: 100vh;
   margin: 0 auto;
   padding: 20px;
@@ -26,14 +27,6 @@
   scrollbar-width: none;
 }
 
-/* Header */
-.live-scores-header {
-  text-align: center;
-  font-size: 2.5rem;
-  color: #ffffff;
-  margin-bottom: 20px;
-  font-weight: 700;
-}
 
 /* Competition Sections */
 .competition-container {
@@ -134,39 +127,42 @@
   color: #ffcc00;
   margin-left: auto; /* Push the score to the right */
 }
-.league-buttons {
+.live-league-buttons {
   display: flex;
-  justify-content: center; /* Center buttons horizontally */
-  gap: 10px;
-  padding: 10px; /* Add some space from the top */
-  z-index: 5; /* Ensure buttons are above other elements */
-  margin-top: 0; /* Remove additional spacing */
-  width: 80%;
-  background-color: #000; 
-  padding-top: 100px;/* Match background color */
+    justify-content: center;
+    gap: 10px;
+    padding-top: 40px; 
+    padding-bottom: 30px;/* Reduced padding to keep buttons at the top */
+    z-index: 5; /* Ensure buttons are above the header */
+    margin-top: 0; /* Remove margin-top to keep buttons at the top */
+    width: 100%; /* Ensure buttons span the full width */
 }
 
-.league-button {
+.live-league-button {
   display: flex;
   align-items: center;
-  padding: 10px 20px;
-  font-size: 1rem;
-  font-weight: 600;
-  color: #ffffff;
-  background-color: #333333;
+  gap: 8px;
+  padding: 10px 15px;
+  border-radius: 10px;
   border: none;
-  border-radius: 5px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  background: #222;
+  color: #fff;
+  font-size: 16px;
+  transition: background 0.3s, color 0.3s;
 }
 
-.league-button:hover {
-  background-color: #555555;
+.live-league-button:hover {
+  background: #fff;
+    color: #000;
+    transform: scale(1.05); /* Slightly scale up the button */
+    box-shadow: 0 4px 8px rgba(224, 248, 9, 0.877);
 }
-
-.league-button.active {
-  background-color: #ffcc00;
-  color: #121212;
+.live-league-button.active {
+  background: #fff;
+  color: #000;
+  transform: scale(1.05); /* Slightly scale up the button */
+  box-shadow: 0 4px 8px rgba(224, 248, 9, 0.877);
 }
 
 .league-button-logo {

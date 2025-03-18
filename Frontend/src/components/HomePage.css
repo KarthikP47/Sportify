@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Monoton&display=swap');
+
 body {
     margin: 0;
     padding: 0;
@@ -17,6 +19,7 @@ body {
 }
 
 .homepage-title {
+    font-family: 'Monoton', cursive;
     font-size: 48px;
     font-weight: bold;
     color: #00ff99;

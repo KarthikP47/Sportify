@@ -1,11 +1,14 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useContext } from "react";
+import { useNavigate, useLocation } from "react-router-dom"; // Import useLocation
 import "./LoginPage.css";
+import { AuthContext } from "./AuthContext";
 
 const LoginPage = () => {
   const navigate = useNavigate();
+  const location = useLocation(); // Access location state
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const { login } = useContext(AuthContext);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -27,10 +30,10 @@ const LoginPage = () => {
       }
 
       const data = await response.json();
+      console.log("Login Response Data:", data); // Debugging: Log the response data
 
-      // Store token and user data in localStorage
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user)); // Assuming backend returns user data
+      // Use the login function from AuthContext to update the state
+      login(data.token, data.user);
 
       alert("Login Successful!");
       navigate("/home");
@@ -44,6 +47,9 @@ const LoginPage = () => {
     <div className="login-container">
       <div className="login-box">
         <h2 className="login-title">Welcome Back</h2>
+        {location.state?.message && ( // Display the message if it exists
+          <p className="login-message">{location.state.message}</p>
+        )}
         <form onSubmit={handleLogin}>
           <input
             type="email"

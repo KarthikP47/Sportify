@@ -62,42 +62,48 @@ app.post("/api/login", async (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
-      return res.status(400).json({ message: "Email and password are required" });
+    return res.status(400).json({ message: "Email and password are required" });
   }
 
   // Find user in database
   const sql = "SELECT * FROM users WHERE email = ?";
   db.query(sql, [email], async (err, results) => {
-      if (err) {
-          console.error("❌ Error checking user:", err);
-          return res.status(500).json({ message: "Login failed" });
-      }
+    if (err) {
+      console.error("❌ Error checking user:", err);
+      return res.status(500).json({ message: "Login failed" });
+    }
 
-      if (results.length === 0) {
-          console.log("❌ No user found with this email:", email);
-          return res.status(401).json({ message: "Invalid email or password" });
-      }
+    if (results.length === 0) {
+      return res.status(401).json({ message: "Invalid email or password" });
+    }
 
-      const user = results[0];
+    const user = results[0];
 
-      // Compare entered password with hashed password from database
-      const isPasswordValid = await bcrypt.compare(password, user.password_hash);
+    // Compare entered password with hashed password from database
+    const isPasswordValid = await bcrypt.compare(password, user.password_hash);
 
-      if (!isPasswordValid) {
-          return res.status(401).json({ message: "Invalid email or password" });
-      }
+    if (!isPasswordValid) {
+      return res.status(401).json({ message: "Invalid email or password" });
+    }
 
-      // Generate JWT token
-      const token = jwt.sign({ user_id: user.user_id, is_admin: user.is_admin }, process.env.JWT_SECRET, {
-          expiresIn: "1h",
-      });
+    // Generate JWT token
+    const token = jwt.sign({ user_id: user.user_id }, process.env.JWT_SECRET, {
+      expiresIn: "1h",
+    });
 
-      res.status(200).json({ message: "✅ Login successful", token });
+    // Return user data (excluding sensitive fields like password_hash)
+    const userData = {
+      user_id: user.user_id,
+      username: user.username,
+      email: user.email,
+      profile_picture: user.profile_picture,
+      age: user.age,
+      created_at: user.created_at,
+    };
+
+    res.status(200).json({ message: "✅ Login successful", token, user: userData });
   });
 });
-
-// Define Top 5 Leagues
-const topLeagues = [39, 140, 61, 78, 135]; // EPL, La Liga, Bundesliga, Serie A, Ligue 1
 
 // ✅ Fetch Standings API
 app.get("/api/standings/:leagueId", async (req, res) => {
@@ -247,6 +253,150 @@ app.get("/api/match-details/:fixtureId", async (req, res) => {
     console.error("❌ Error fetching match details:", error.message);
     console.error("🔴 API Response:", error.response?.data);
     res.status(500).json({ message: "Failed to fetch match details" });
+  }
+});
+
+app.get("/api/transfers/filter", (req, res) => {
+  const { league, team, ageFrom, ageTo, feeFrom, feeTo, limit = 50, offset = 0 } = req.query;
+
+  let query = "SELECT * FROM transfers WHERE 1=1";
+  const params = [];
+
+  if (league) {
+    query += " AND league_name = ?";
+    params.push(league);
+  }
+  if (team) {
+    query += " AND (to_team = ? OR from_team = ?)";
+    params.push(team, team);
+  }
+  if (ageFrom) {
+    query += " AND age >= ?";
+    params.push(parseInt(ageFrom, 10));
+  }
+  if (ageTo) {
+    query += " AND age <= ?";
+    params.push(parseInt(ageTo, 10));
+  }
+  if (feeFrom) {
+    query += " AND fee >= ?";
+    params.push(parseFloat(feeFrom));
+  }
+  if (feeTo) {
+    query += " AND fee <= ?";
+    params.push(parseFloat(feeTo));
+  }
+
+  query += " LIMIT ? OFFSET ?";
+  params.push(parseInt(limit, 10), parseInt(offset, 10));
+
+  db.query(query, params, (err, results) => {
+    if (err) {
+      console.error("❌ Error fetching filtered transfers:", err);
+      res.status(500).json({ error: "Database error" });
+    } else {
+      res.json(results);
+    }
+  });
+});
+
+const authenticate = (req, res, next) => {
+  const token = req.header("Authorization")?.split(" ")[1];
+
+  if (!token) return res.status(401).json({ message: "Unauthorized: No token provided" });
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded;
+
+    if (!req.user.user_id) {
+      console.error("❌ ERROR: `user_id` is missing from token!");
+      return res.status(401).json({ message: "Unauthorized: Invalid token (missing user_id)" });
+    }
+    next();
+  } catch (error) {
+    console.error("❌ Token Verification Error:", error.message);
+    return res.status(401).json({ message: "Unauthorized: Invalid token" });
+  }
+};
+
+// ✅ Create Post
+app.post("/api/posts", authenticate, async (req, res) => {
+  const { title, content } = req.body;
+  if (!title || !content) return res.status(400).json({ message: "Title and content are required" });
+
+  try {
+    const sql = "INSERT INTO posts (user_id, title, content, likes) VALUES (?, ?, ?, 0)";
+    const [result] = await db.promise().query(sql, [req.user.user_id, title, content]);
+
+    res.status(201).json({ message: "✅ Post created successfully", post_id: result.insertId });
+  } catch (error) {
+    console.error("❌ Post Creation Error:", error);
+    res.status(500).json({ message: "Error creating post", error: error.message });
+  }
+});
+
+// ✅ Get Posts with Pagination
+app.get("/api/posts", async (req, res) => {
+  const limit = parseInt(req.query.limit) || 10;
+  const page = parseInt(req.query.page) || 1;
+  const offset = (page - 1) * limit;
+
+  try {
+    const [posts] = await db.promise().query(
+      `SELECT posts.id, posts.title, posts.content, users.username, posts.created_at, posts.likes 
+       FROM posts 
+       JOIN users ON posts.user_id = users.user_id 
+       ORDER BY posts.created_at DESC 
+       LIMIT ? OFFSET ?`, 
+      [limit, offset]
+    );
+
+    res.status(200).json(posts);
+  } catch (error) {
+    console.error("❌ Fetch Posts Error:", error);
+    res.status(500).json({ message: "Error fetching posts" });
+  }
+});
+
+
+// ✅ Delete Post (Only Author or Admin)
+app.delete("/api/posts/:postId", authenticate, async (req, res) => {
+  const { postId } = req.params;
+
+  try {
+    const [post] = await db.promise().query("SELECT user_id FROM posts WHERE id = ?", [postId]);
+
+    if (!post.length) return res.status(404).json({ message: "Post not found" });
+    if (post[0].user_id !== req.user.user_id && !req.user.is_admin)
+      return res.status(403).json({ message: "Unauthorized to delete this post" });
+
+    await db.promise().query("DELETE FROM posts WHERE id = ?", [postId]);
+    res.status(200).json({ message: "✅ Post deleted successfully" });
+  } catch (error) {
+    console.error("❌ Delete Post Error:", error);
+    res.status(500).json({ message: "Error deleting post" });
+  }
+});
+
+// ✅ Like Post API (Increments likes in `posts` table)
+app.post("/posts/:postId/like", async (req, res) => {
+  const postId = req.params.postId;
+
+  try {
+    // Check if post exists
+    const [post] = await db.query("SELECT likes FROM posts WHERE id = ?", [postId]);
+    if (post.length === 0) {
+      return res.status(404).json({ error: "Post not found" });
+    }
+
+    // Increment like count
+    await db.query("UPDATE posts SET likes = likes + 1 WHERE id = ?", [postId]);
+
+    res.json({ message: "Post liked successfully" });
+  } catch (error) {
+    console.error("Error liking post:", error);
+    res.status(500).json({ error: "Database error" });
   }
 });
 

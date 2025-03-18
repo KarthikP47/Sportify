@@ -1,5 +1,5 @@
 /* Rumors.css */
-@import url('https://fonts.googleapis.com/css2?family=Bungee&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Big+Shoulders+Stencil:opsz,wght@10..72,100..900&family=Tektur:wght@400..900&display=swap');
 
 .rumors-market {
     padding: 20px;
@@ -12,7 +12,7 @@
   }
   
   .rumors-market h2 {
-    font-family: 'Bungee';
+    font-family: 'Tektur', cursive;
     font-size: 50px;
     margin-bottom: 20px;
     text-align: center;
@@ -27,7 +27,7 @@
   }
   
   .news-item {
-    background-color: #ffffff; /* White background for cards */
+    background-color: #333333; /* White background for cards */
     padding: 15px;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -44,12 +44,12 @@
   .news-item h3 {
     font-size: 18px;
     margin: 0 0 10px;
-    color: #007bff; /* Blue color for headlines */
+    color: #8bdf06; /* Blue color for headlines */
   }
   
   .news-item p {
     font-size: 14px;
-    color: #555; /* Gray text color */
+    color: #ffffff; /* Gray text color */
     margin: 5px 0;
   }
   

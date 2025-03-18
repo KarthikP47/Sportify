@@ -10,7 +10,6 @@ export const AuthProvider = ({ children }) => {
     const token = localStorage.getItem("token");
     const userDataString = localStorage.getItem("user");
 
-    // Check if userDataString is not null or undefined before parsing
     if (token && userDataString) {
       try {
         const userData = JSON.parse(userDataString);

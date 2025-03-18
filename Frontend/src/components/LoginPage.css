@@ -5,7 +5,7 @@ html, body {
     display: flex;
     justify-content: center;
     align-items: center;
-    background: linear-gradient(to bottom, #121212, #1e1e1e); /* Matches the dark theme */
+    background: #000; /* Matches the dark theme */
     color: white;
 }
 

@@ -126,3 +126,7 @@
   background: #ffffff;
   color:black;
 }
+.navbar-profile{
+  display:flex;
+  gap:15px;
+}
