@@ -5,9 +5,11 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import axios from "axios";
+import multer from "multer"
+
+
 
 dotenv.config();
-
 const app = express();
 const port = process.env.PORT || 5000;
 
@@ -104,6 +106,25 @@ app.post("/api/login", async (req, res) => {
     res.status(200).json({ message: "✅ Login successful", token, user: userData });
   });
 });
+const storage = multer.diskStorage({
+  destination: "./uploads/",
+  filename: (req, file, cb) => {
+      cb(null, Date.now() + path.extname(file.originalname)); // Rename file
+  }
+});
+
+const upload = multer({ storage });
+
+// Serve static files
+app.use("/uploads", express.static("uploads"));
+
+// Profile picture upload route
+app.post("/api/upload", upload.single("profilePic"), (req, res) => {
+  if (!req.file) {
+      return res.status(400).json({ error: "No file uploaded" });
+  }
+  res.json({ imageUrl: `/uploads/${req.file.filename}` });
+});
 
 // ✅ Fetch Standings API
 app.get("/api/standings/:leagueId", async (req, res) => {
@@ -166,7 +187,7 @@ app.get("/api/rumors", async (req, res) => {
   try {
     const response = await axios.get(process.env.NEWS_API_URL, {
       params: {
-        q: "football OR soccer", // Only fetch football/soccer-related news
+        q: "football transfers OR soccer transfers", // Only fetch football/soccer-related news
         apiKey: process.env.NEWS_API_KEY, // Use NEWS_API_KEY from .env
         pageSize: 50, // Limit the number of results
         language: "en", // Fetch English articles only
@@ -302,15 +323,12 @@ app.get("/api/transfers/filter", (req, res) => {
 
 const authenticate = (req, res, next) => {
   const token = req.header("Authorization")?.split(" ")[1];
-
   if (!token) return res.status(401).json({ message: "Unauthorized: No token provided" });
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.user = decoded;
-
     if (!req.user.user_id) {
-      console.error("❌ ERROR: `user_id` is missing from token!");
       return res.status(401).json({ message: "Unauthorized: Invalid token (missing user_id)" });
     }
     next();
@@ -320,7 +338,7 @@ const authenticate = (req, res, next) => {
   }
 };
 
-// ✅ Create Post
+// ✅ Create Post (Only Logged In Users)
 app.post("/api/posts", authenticate, async (req, res) => {
   const { title, content } = req.body;
   if (!title || !content) return res.status(400).json({ message: "Title and content are required" });
@@ -328,7 +346,6 @@ app.post("/api/posts", authenticate, async (req, res) => {
   try {
     const sql = "INSERT INTO posts (user_id, title, content, likes) VALUES (?, ?, ?, 0)";
     const [result] = await db.promise().query(sql, [req.user.user_id, title, content]);
-
     res.status(201).json({ message: "✅ Post created successfully", post_id: result.insertId });
   } catch (error) {
     console.error("❌ Post Creation Error:", error);
@@ -336,7 +353,7 @@ app.post("/api/posts", authenticate, async (req, res) => {
   }
 });
 
-// ✅ Get Posts with Pagination
+// ✅ Get All Posts (Open to All)
 app.get("/api/posts", async (req, res) => {
   const limit = parseInt(req.query.limit) || 10;
   const page = parseInt(req.query.page) || 1;
@@ -348,17 +365,15 @@ app.get("/api/posts", async (req, res) => {
        FROM posts 
        JOIN users ON posts.user_id = users.user_id 
        ORDER BY posts.created_at DESC 
-       LIMIT ? OFFSET ?`, 
+       LIMIT ? OFFSET ?`,
       [limit, offset]
     );
-
     res.status(200).json(posts);
   } catch (error) {
     console.error("❌ Fetch Posts Error:", error);
     res.status(500).json({ message: "Error fetching posts" });
   }
 });
-
 
 // ✅ Delete Post (Only Author or Admin)
 app.delete("/api/posts/:postId", authenticate, async (req, res) => {
@@ -379,26 +394,85 @@ app.delete("/api/posts/:postId", authenticate, async (req, res) => {
   }
 });
 
-// ✅ Like Post API (Increments likes in `posts` table)
-app.post("/posts/:postId/like", async (req, res) => {
+// ✅ Like Post (Only Logged In Users, One Like Per User)
+app.post("/posts/:postId/like", authenticate, async (req, res) => {
   const postId = req.params.postId;
+  const userId = req.user.user_id;
 
   try {
     // Check if post exists
-    const [post] = await db.query("SELECT likes FROM posts WHERE id = ?", [postId]);
-    if (post.length === 0) {
-      return res.status(404).json({ error: "Post not found" });
+    const [post] = await db.promise().query("SELECT * FROM posts WHERE id = ?", [postId]);
+    if (!post.length) return res.status(404).json({ message: "Post not found" });
+
+    // Check if already liked
+    const [existingLike] = await db.promise().query(
+      "SELECT * FROM likes WHERE user_id = ? AND post_id = ?",
+      [userId, postId]
+    );
+
+    if (existingLike.length > 0) {
+      return res.status(400).json({ message: "You already liked this post." });
     }
 
-    // Increment like count
-    await db.query("UPDATE posts SET likes = likes + 1 WHERE id = ?", [postId]);
+    // Add like
+    await db.promise().query("INSERT INTO likes (user_id, post_id) VALUES (?, ?)", [userId, postId]);
+    await db.promise().query("UPDATE posts SET likes = likes + 1 WHERE id = ?", [postId]);
 
-    res.json({ message: "Post liked successfully" });
+    res.status(200).json({ message: "Post liked successfully" });
   } catch (error) {
     console.error("Error liking post:", error);
-    res.status(500).json({ error: "Database error" });
+    res.status(500).json({ message: "Error processing like" });
   }
 });
+
+// Fetch teams for a specific league
+app.get("/api/leagues", async (req, res) => {
+  try {
+    const [rows] = await db.query("SELECT league_id, league_name, country FROM leagues");
+    res.json(rows);
+  } catch (err) {
+    console.error("Error fetching leagues:", err);
+    res.status(500).json({ error: "Failed to fetch leagues" });
+  }
+});
+
+
+app.get("/api/teams/:leagueId", async (req, res) => {
+  try {
+    const { leagueId } = req.params;
+    const [rows] = await db.query(
+      "SELECT team_id, team_name, stadium, logo FROM teams WHERE league_id = ?", 
+      [leagueId]
+    );
+    res.json(rows);
+  } catch (err) {
+    console.error("Error fetching teams from database:", err);
+    res.status(500).json({ error: "Failed to fetch teams" });
+  }
+});
+
+
+app.get("/api/team/:teamId", async (req, res) => {
+  try {
+    const { teamId } = req.params;
+    const [rows] = await db.query(`
+      SELECT t.*, l.league_name
+      FROM teams t
+      JOIN leagues l ON t.league_id = l.league_id
+      WHERE t.team_id = ?
+    `, [teamId]);
+
+    if (rows.length === 0) {
+      return res.status(404).json({ error: "Team not found" });
+    }
+
+    res.json(rows[0]);
+  } catch (err) {
+    console.error("Error fetching team details from DB:", err);
+    res.status(500).json({ error: "Failed to fetch team details" });
+  }
+});
+
 
 // ✅ Start Server
 app.listen(port, () => {

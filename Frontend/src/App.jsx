@@ -12,6 +12,9 @@ import Fixtures from "./pages/Fixtures/Fixtures"
 import { AuthProvider } from "./components/AuthContext";
 import ProfilePage from "./components/ProfilePage";
 import Posts from "./pages/Posts/Posts"
+import TeamPage from "./pages/TeamPage/TeamPage";
+import TeamDetails from "./pages/TeamDetails/TeamDetails";
+import LeaguesPage from "./pages/LeaguesPage/LeaguesPage";
 function App() {
   return (
     <AuthProvider>
@@ -29,7 +32,11 @@ function App() {
         <Route path="/signup" element={<SignPage />} />
         <Route path="/fixtures" element={<Fixtures />} />
         <Route path="/profile" element={<ProfilePage />} />
-        <Route path="/match-details/:fixtureId" element={<MatchDetails />} /> 
+        <Route path="/match-details/:fixtureId" element={<MatchDetails />} />
+        <Route path="/team/:teamId" element={<TeamDetails />} />
+        <Route path="/teams" element={<TeamPage />} />
+        <Route path="/leagues" element={<LeaguesPage />} />
+
       </Routes>
     </Router>
     </AuthProvider>

@@ -1,111 +1,122 @@
-import { useEffect, useState } from "react";
-import API from "../../../utils/api";
-import { getUser } from "../../../utils/auth";
-import { FaHeart, FaComment, FaPlus } from "react-icons/fa"; 
+import { useEffect, useState, useContext } from "react";
+import { AuthContext } from "../../components/AuthContext";
+import { FaHeart, FaComment, FaPlus } from "react-icons/fa";
 import { format } from "date-fns";
+import "./Posts.css";
 
-const Posts = () => {
-  const [posts, setPosts] = useState([]); 
+const ForumPosts = () => {
+  const { isLoggedIn, user } = useContext(AuthContext);
+  const [forumPosts, setForumPosts] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [newPost, setNewPost] = useState({ title: "", content: "" });
-  const user = getUser();
+  const [isForumModalOpen, setIsForumModalOpen] = useState(false);
+  const [newForumPost, setNewForumPost] = useState({ title: "", content: "" });
 
-  // Fetch all posts 
-  const fetchPosts = async () => {
+  const fetchForumPosts = async () => {
     setLoading(true);
     try {
-      const { data } = await API.get(`/posts`); 
-      setPosts(data);
+      const response = await fetch("http://localhost:5000/api/posts");
+      const data = await response.json();
+      setForumPosts(data);
     } catch (error) {
-      console.error("Error fetching posts:", error);
+      console.error("Error fetching forum posts:", error);
     } finally {
       setLoading(false);
     }
   };
 
-  // Load posts on component mount
   useEffect(() => {
-    fetchPosts();
+    fetchForumPosts();
   }, []);
 
-  // Handle Like Button Click
-  const handleLike = async (postId) => {
+  const handleForumLike = async (postId) => {
+    if (!isLoggedIn) {
+      alert("Please login to like forum posts.");
+      return;
+    }
     try {
-      await API.post(`posts/${postId}/like`);
-      setPosts(posts.map((post) =>
-        post.id === postId
-          ? { ...post, liked: !post.liked, likes: post.liked ? post.likes - 1 : post.likes + 1 }
-          : post
-      ));
+      await fetch(`http://localhost:5000/posts/${postId}/like`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+      fetchForumPosts();
     } catch (error) {
-      alert("Error liking post");
+      alert("Error liking forum post", error);
     }
   };
 
-  // Handle Create Post Submission
-  const handleCreatePost = async () => {
+  const handleCreateForumPost = async () => {
+    if (!isLoggedIn) {
+      alert("Please login to create forum posts.");
+      return;
+    }
     try {
-      const { data } = await API.post(
-        "/posts",
-        newPost
-      );
-      setPosts([data, ...posts]); 
-      setNewPost({ title: "", content: "" }); 
-      setIsModalOpen(false);
-      fetchPosts();
+      await fetch("http://localhost:5000/api/posts", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify(newForumPost),
+      });
+      setNewForumPost({ title: "", content: "" });
+      setIsForumModalOpen(false);
+      fetchForumPosts();
     } catch (error) {
-      console.error("Error creating post:", error);
+      console.error("Error creating forum post:", error);
     }
   };
 
   const formatDate = (timestamp) => {
     if (!timestamp) return "Unknown Date";
     const date = new Date(timestamp);
-    return format(date, "yyyy-MM-dd HH:mm"); // Format as "YYYY-MM-DD HH:mm"
+    return format(date, "yyyy-MM-dd HH:mm");
   };
 
   return (
-    <div className="flex justify-center bg-black min-h-screen p-6 mt-300 overflow-y-auto w-screen">
-      <div className="w-full max-w-screen-lg mx-auto">
-        {/* Create Post Button */}
-        <button
-          className="bg-blue-500 text-white px-4 py-2 rounded-lg flex items-center mb-4 hover:bg-blue-600 mt-150"
-          onClick={() => setIsModalOpen(true)}
-        >
-          <FaPlus className="mr-2" /> Create Post
-        </button>
+    <div className="forum-container">
+      <div className="forum-wrapper">
+        {isLoggedIn && (
+          <>
+            <div className="forum-create-btn-container">
+              <button className="forum-create-btn" onClick={() => setIsForumModalOpen(true)}>
+                <FaPlus className="forum-icon" /> Create Forum Post
+              </button>
+            </div>
+            <p className="forum-logged-in-text">
+              Logged in as: <span className="forum-bold">{user?.username}</span>
+            </p>
+          </>
+        )}
 
-        {/* Create Post Modal */}
-        {isModalOpen && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-            <div className="bg-gray-900 text-white p-6 rounded-lg w-96">
-              <h2 className="text-lg font-bold mb-4">Create a Post</h2>
+        {isForumModalOpen && (
+          <div className="forum-modal-backdrop">
+            <div className="forum-modal-box">
+              <h2 className="forum-modal-title">Create a Forum Post</h2>
               <input
                 type="text"
-                className="w-full p-2 mb-2 bg-gray-800 rounded text-white"
+                className="forum-input-field"
                 placeholder="Title"
-                value={newPost.title}
-                onChange={(e) => setNewPost({ ...newPost, title: e.target.value })}
+                value={newForumPost.title}
+                onChange={(e) =>
+                  setNewForumPost({ ...newForumPost, title: e.target.value })
+                }
               />
               <textarea
-                className="w-full p-2 mb-2 bg-gray-800 rounded text-white"
+                className="forum-input-field"
                 placeholder="Content"
                 rows="4"
-                value={newPost.content}
-                onChange={(e) => setNewPost({ ...newPost, content: e.target.value })}
+                value={newForumPost.content}
+                onChange={(e) =>
+                  setNewForumPost({ ...newForumPost, content: e.target.value })
+                }
               ></textarea>
-              <div className="flex justify-between">
-                <button
-                  className="bg-green-500 px-4 py-2 rounded-lg hover:bg-green-600"
-                  onClick={handleCreatePost}
-                >
+              <div className="forum-modal-actions">
+                <button className="forum-modal-post" onClick={handleCreateForumPost}>
                   Post
                 </button>
-                <button
-                  className="bg-red-500 px-4 py-2 rounded-lg hover:bg-red-600"
-                  onClick={() => setIsModalOpen(false)}
-                >
+                <button className="forum-modal-cancel" onClick={() => setIsForumModalOpen(false)}>
                   Cancel
                 </button>
               </div>
@@ -113,37 +124,34 @@ const Posts = () => {
           </div>
         )}
 
-        {loading && <p className="text-center text-gray-400">Loading posts...</p>}
+        {loading && <p className="forum-loading">Loading forum posts...</p>}
+        {!loading && forumPosts.length === 0 && (
+          <p className="forum-no-posts">No forum posts available.</p>
+        )}
 
-        {!loading && posts.length === 0 && <p className="text-center text-gray-400">No posts available.</p>}
-
-        {posts.map((post) => (
-          <div style={{ backgroundColor: "#222" }}
-            key={post.id} 
-            className="bg-gray-900 text-white shadow-md p-8 mb-6 border border-gray-800 w-full min-h-[200px] rounded-lg"
-          >
-            {/* User Info */}
-            <div className="flex items-center mb-2">
-              <p className="font-semibold">{post.username}</p>
-              <p className="text-xs text-gray-400 ml-2">{formatDate(post.created_at) || "Just now"}</p>
+        {forumPosts.map((post) => (
+          <div key={post.id} className="forum-card">
+            <div className="forum-header">
+              <p className="forum-username">{post.username}</p>
+              <p className="forum-date">{formatDate(post.created_at)}</p>
             </div>
+            <h2 className="forum-title">{post.title}</h2>
+            <p className="forum-content">{post.content}</p>
 
-            {/* Post Content */}
-            <h2 className="text-lg font-bold">{post.title}</h2>
-            <p className="text-gray-300">{post.content}</p>
-
-            {/* Engagement Section */}
-            <div className="flex items-center mt-4 text-gray-400">
+            <div className="forum-actions">
               <button
-                className={`flex items-center mr-4 ${post.liked ? "text-red-500" : "text-gray-400"} hover:text-red-500`}
-                onClick={() => handleLike(post.id)}
+                className="forum-like-btn"
+                onClick={() => handleForumLike(post.id)}
               >
-                <FaHeart className="mr-1" />
+                <FaHeart className="forum-icon" />
                 {post.likes || 0}
               </button>
 
-              <button className="flex items-center mr-4 hover:text-blue-400">
-                <FaComment className="mr-1" />
+              <button
+                className="forum-comment-btn"
+                onClick={() => alert("Commenting coming soon...")}
+              >
+                <FaComment className="forum-icon" />
                 {post.comments || 0}
               </button>
             </div>
@@ -154,4 +162,4 @@ const Posts = () => {
   );
 };
 
-export default Posts;
+export default ForumPosts;
