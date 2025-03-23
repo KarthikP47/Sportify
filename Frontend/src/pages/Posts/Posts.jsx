@@ -10,6 +10,8 @@ const ForumPosts = () => {
   const [loading, setLoading] = useState(false);
   const [isForumModalOpen, setIsForumModalOpen] = useState(false);
   const [newForumPost, setNewForumPost] = useState({ title: "", content: "" });
+  const [commentInputs, setCommentInputs] = useState({}); // Track comment input per post
+  const [showComments, setShowComments] = useState({}); // Track visibility of comments per post
 
   const fetchForumPosts = async () => {
     setLoading(true);
@@ -68,10 +70,39 @@ const ForumPosts = () => {
     }
   };
 
+  const handleCommentSubmit = async (postId) => {
+    const content = commentInputs[postId];
+    if (!content || !isLoggedIn) return;
+
+    try {
+      await fetch(`http://localhost:5000/api/posts/${postId}/comments/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify({ content }),
+      });
+
+      setCommentInputs({ ...commentInputs, [postId]: "" });
+      fetchForumPosts();
+    } catch (err) {
+      console.error("Error adding comment:", err);
+    }
+  };
+
   const formatDate = (timestamp) => {
     if (!timestamp) return "Unknown Date";
     const date = new Date(timestamp);
     return format(date, "yyyy-MM-dd HH:mm");
+  };
+
+  // Toggle comments visibility for a specific post
+  const toggleComments = (postId) => {
+    setShowComments((prev) => ({
+      ...prev,
+      [postId]: !prev[postId], // Toggle visibility
+    }));
   };
 
   return (
@@ -149,12 +180,44 @@ const ForumPosts = () => {
 
               <button
                 className="forum-comment-btn"
-                onClick={() => alert("Commenting coming soon...")}
+                onClick={() => toggleComments(post.id)} // Toggle comments visibility
               >
                 <FaComment className="forum-icon" />
-                {post.comments || 0}
+                {post.comments?.length || 0}
               </button>
             </div>
+
+            {/* 💬 Comments Display (only shown if showComments[post.id] is true) */}
+            {showComments[post.id] && (
+              <div className="forum-comments">
+                {post.comments?.map((comment, index) => (
+                  <div key={index} className="forum-comment">
+                    <p><strong>{comment.username}</strong>: {comment.content}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* 💬 Add Comment Input (only shown if showComments[post.id] is true) */}
+            {isLoggedIn && showComments[post.id] && (
+              <div className="forum-comment-form">
+                <input
+                  type="text"
+                  className="forum-input-field"
+                  placeholder="Write a comment..."
+                  value={commentInputs[post.id] || ""}
+                  onChange={(e) =>
+                    setCommentInputs({ ...commentInputs, [post.id]: e.target.value })
+                  }
+                />
+                <button
+                  className="forum-comment-submit"
+                  onClick={() => handleCommentSubmit(post.id)}
+                >
+                  Submit
+                </button>
+              </div>
+            )}
           </div>
         ))}
       </div>

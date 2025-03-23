@@ -320,7 +320,6 @@ app.get("/api/transfers/filter", (req, res) => {
     }
   });
 });
-
 const authenticate = (req, res, next) => {
   const token = req.header("Authorization")?.split(" ")[1];
   if (!token) return res.status(401).json({ message: "Unauthorized: No token provided" });
@@ -353,7 +352,7 @@ app.post("/api/posts", authenticate, async (req, res) => {
   }
 });
 
-// ✅ Get All Posts (Open to All)
+// ✅ Get All Posts (Open to All) — includes comments
 app.get("/api/posts", async (req, res) => {
   const limit = parseInt(req.query.limit) || 10;
   const page = parseInt(req.query.page) || 1;
@@ -368,7 +367,23 @@ app.get("/api/posts", async (req, res) => {
        LIMIT ? OFFSET ?`,
       [limit, offset]
     );
-    res.status(200).json(posts);
+
+    // Attach comments to each post
+    const postsWithComments = await Promise.all(
+      posts.map(async (post) => {
+        const [comments] = await db.promise().query(
+          `SELECT comments.content, comments.created_at, users.username 
+           FROM comments 
+           JOIN users ON comments.user_id = users.user_id 
+           WHERE comments.post_id = ? 
+           ORDER BY comments.created_at ASC`,
+          [post.id]
+        );
+        return { ...post, comments };
+      })
+    );
+
+    res.status(200).json(postsWithComments);
   } catch (error) {
     console.error("❌ Fetch Posts Error:", error);
     res.status(500).json({ message: "Error fetching posts" });
@@ -424,6 +439,63 @@ app.post("/posts/:postId/like", authenticate, async (req, res) => {
     res.status(500).json({ message: "Error processing like" });
   }
 });
+
+// ✅ Get Comments for a Post (Open to All)
+app.get("/api/posts/:postId/comments/", async (req, res) => {
+  const { postId } = req.params;
+
+  try {
+    const [comments] = await db
+      .promise()
+      .query(
+        `SELECT comments.id, comments.content, comments.created_at, users.username
+         FROM comments 
+         JOIN users ON comments.user_id = users.user_id 
+         WHERE comments.post_id = ? 
+         ORDER BY comments.created_at ASC`,
+        [postId]
+      );
+
+    res.status(200).json(comments);
+  } catch (error) {
+    console.error("❌ Fetch Comments Error:", error);
+    res.status(500).json({ message: "Error fetching comments", error: error.message });
+  }
+});
+
+// ✅ Add Comment (Only Logged In Users)
+app.post("/api/posts/:postId/comments/", authenticate, async (req, res) => {
+  const { postId } = req.params;
+  const { content } = req.body;
+  const userId = req.user.user_id;
+
+  // Step 1: Validate content
+  if (!content || content.trim() === "") {
+    return res.status(400).json({ message: "Comment content cannot be empty" });
+  }
+
+  try {
+    // Step 2: Check if post exists
+    const [post] = await db.promise().query("SELECT id FROM posts WHERE id = ?", [postId]);
+    if (!post.length) {
+      return res.status(404).json({ message: "Post not found" });
+    }
+
+    // Step 3: Insert the comment
+    await db.promise().query(
+      "INSERT INTO comments (user_id, post_id, content) VALUES (?, ?, ?)",
+      [userId, postId, content]
+    );
+
+    res.status(201).json({ message: "✅ Comment added successfully" });
+  } catch (error) {
+    console.error("❌ Add Comment Error:", error);
+    res.status(500).json({ message: "Error adding comment", error: error.message });
+  }
+});
+
+
+
 
 // Fetch teams for a specific league
 app.get("/api/leagues", async (req, res) => {
