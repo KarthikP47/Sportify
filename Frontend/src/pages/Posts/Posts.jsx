@@ -1,4 +1,4 @@
-import { useEffect, useState, useContext } from "react";
+﻿import { useEffect, useState, useContext } from "react";
 import { AuthContext } from "../../components/AuthContext";
 import { FaHeart, FaComment, FaPlus } from "react-icons/fa";
 import { format } from "date-fns";
@@ -10,8 +10,16 @@ const ForumPosts = () => {
   const [loading, setLoading] = useState(false);
   const [isForumModalOpen, setIsForumModalOpen] = useState(false);
   const [newForumPost, setNewForumPost] = useState({ title: "", content: "" });
-  const [commentInputs, setCommentInputs] = useState({}); // Track comment input per post
-  const [showComments, setShowComments] = useState({}); // Track visibility of comments per post
+  const [commentInputs, setCommentInputs] = useState({});
+  const [showComments, setShowComments] = useState({});
+
+  const getAuthHeaders = () => {
+    const token = localStorage.getItem("token");
+    return {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    };
+  };
 
   const fetchForumPosts = async () => {
     setLoading(true);
@@ -35,16 +43,16 @@ const ForumPosts = () => {
       alert("Please login to like forum posts.");
       return;
     }
+
     try {
-      await fetch(`http://localhost:5000/posts/${postId}/like`, {
+      await fetch(`http://localhost:5000/api/posts/${postId}/like`, {
         method: "POST",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
+        headers: getAuthHeaders(),
       });
-      fetchForumPosts();
+      await fetchForumPosts();
     } catch (error) {
-      alert("Error liking forum post", error);
+      alert("Error liking forum post");
+      console.error(error);
     }
   };
 
@@ -53,18 +61,16 @@ const ForumPosts = () => {
       alert("Please login to create forum posts.");
       return;
     }
+
     try {
       await fetch("http://localhost:5000/api/posts", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
+        headers: getAuthHeaders(),
         body: JSON.stringify(newForumPost),
       });
       setNewForumPost({ title: "", content: "" });
       setIsForumModalOpen(false);
-      fetchForumPosts();
+      await fetchForumPosts();
     } catch (error) {
       console.error("Error creating forum post:", error);
     }
@@ -77,15 +83,12 @@ const ForumPosts = () => {
     try {
       await fetch(`http://localhost:5000/api/posts/${postId}/comments/`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
+        headers: getAuthHeaders(),
         body: JSON.stringify({ content }),
       });
 
       setCommentInputs({ ...commentInputs, [postId]: "" });
-      fetchForumPosts();
+      await fetchForumPosts();
     } catch (err) {
       console.error("Error adding comment:", err);
     }
@@ -97,11 +100,10 @@ const ForumPosts = () => {
     return format(date, "yyyy-MM-dd HH:mm");
   };
 
-  // Toggle comments visibility for a specific post
   const toggleComments = (postId) => {
     setShowComments((prev) => ({
       ...prev,
-      [postId]: !prev[postId], // Toggle visibility
+      [postId]: !prev[postId],
     }));
   };
 
@@ -180,14 +182,13 @@ const ForumPosts = () => {
 
               <button
                 className="forum-comment-btn"
-                onClick={() => toggleComments(post.id)} // Toggle comments visibility
+                onClick={() => toggleComments(post.id)}
               >
                 <FaComment className="forum-icon" />
                 {post.comments?.length || 0}
               </button>
             </div>
 
-            {/* 💬 Comments Display (only shown if showComments[post.id] is true) */}
             {showComments[post.id] && (
               <div className="forum-comments">
                 {post.comments?.map((comment, index) => (
@@ -198,7 +199,6 @@ const ForumPosts = () => {
               </div>
             )}
 
-            {/* 💬 Add Comment Input (only shown if showComments[post.id] is true) */}
             {isLoggedIn && showComments[post.id] && (
               <div className="forum-comment-form">
                 <input

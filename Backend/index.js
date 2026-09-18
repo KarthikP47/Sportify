@@ -5,13 +5,20 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import axios from "axios";
-import multer from "multer"
-
+import multer from "multer";
+import fs from "fs";
+import path from "path";
 
 
 dotenv.config();
 const app = express();
 const port = process.env.PORT || 5000;
+const JWT_SECRET = process.env.JWT_SECRET || "dev-secret-key";
+const uploadDir = path.join(process.cwd(), "uploads");
+
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
 
 // Middleware
 app.use(cors({ origin: "http://localhost:5173" })); // Allow requests from frontend
@@ -89,7 +96,7 @@ app.post("/api/login", async (req, res) => {
     }
 
     // Generate JWT token
-    const token = jwt.sign({ user_id: user.user_id }, process.env.JWT_SECRET, {
+    const token = jwt.sign({ user_id: user.user_id }, JWT_SECRET, {
       expiresIn: "1h",
     });
 
@@ -107,9 +114,9 @@ app.post("/api/login", async (req, res) => {
   });
 });
 const storage = multer.diskStorage({
-  destination: "./uploads/",
+  destination: uploadDir,
   filename: (req, file, cb) => {
-      cb(null, Date.now() + path.extname(file.originalname)); // Rename file
+      cb(null, `${Date.now()}${path.extname(file.originalname)}`);
   }
 });
 
@@ -325,7 +332,7 @@ const authenticate = (req, res, next) => {
   if (!token) return res.status(401).json({ message: "Unauthorized: No token provided" });
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, JWT_SECRET);
     req.user = decoded;
     if (!req.user.user_id) {
       return res.status(401).json({ message: "Unauthorized: Invalid token (missing user_id)" });
@@ -410,16 +417,14 @@ app.delete("/api/posts/:postId", authenticate, async (req, res) => {
 });
 
 // ✅ Like Post (Only Logged In Users, One Like Per User)
-app.post("/posts/:postId/like", authenticate, async (req, res) => {
+const likePostHandler = async (req, res) => {
   const postId = req.params.postId;
   const userId = req.user.user_id;
 
   try {
-    // Check if post exists
     const [post] = await db.promise().query("SELECT * FROM posts WHERE id = ?", [postId]);
     if (!post.length) return res.status(404).json({ message: "Post not found" });
 
-    // Check if already liked
     const [existingLike] = await db.promise().query(
       "SELECT * FROM likes WHERE user_id = ? AND post_id = ?",
       [userId, postId]
@@ -429,7 +434,6 @@ app.post("/posts/:postId/like", authenticate, async (req, res) => {
       return res.status(400).json({ message: "You already liked this post." });
     }
 
-    // Add like
     await db.promise().query("INSERT INTO likes (user_id, post_id) VALUES (?, ?)", [userId, postId]);
     await db.promise().query("UPDATE posts SET likes = likes + 1 WHERE id = ?", [postId]);
 
@@ -438,7 +442,10 @@ app.post("/posts/:postId/like", authenticate, async (req, res) => {
     console.error("Error liking post:", error);
     res.status(500).json({ message: "Error processing like" });
   }
-});
+};
+
+app.post("/api/posts/:postId/like", authenticate, likePostHandler);
+app.post("/posts/:postId/like", authenticate, likePostHandler);
 
 // ✅ Get Comments for a Post (Open to All)
 app.get("/api/posts/:postId/comments/", async (req, res) => {
